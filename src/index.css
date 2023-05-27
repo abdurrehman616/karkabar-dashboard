@@ -1,3 +1,35 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.container {
+    @apply max-w-full p-6 mx-auto
+}
+
+.container-sm {
+    @apply max-w-full px-6 py-3 mx-auto
+}
+
+.collapse {
+    @apply h-auto
+}
+
+.collapse-title, :where(.collapse > input[type="checkbox"]) {
+    @apply p-0 m-0 min-h-0 pb-2
+}
+
+.collapse-content {
+    @apply pl-10
+}
+
+.button {
+    @apply text-left
+}
+
+::placeholder {
+    font-size: 0.75rem;
+}
+
+i {
+    @apply text-base-100
+}
