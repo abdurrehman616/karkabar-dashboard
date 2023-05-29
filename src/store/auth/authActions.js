@@ -1,15 +1,24 @@
 // authActions.js
 import {
+    forgetPasswordFailure,
+    forgetPasswordStart,
+    forgetPasswordSuccess,
+    loginFailure,
     loginStart,
     loginSuccess,
-    loginFailure,
     logout,
+    registerFailure,
     registerStart,
-    registerSuccess,
-    registerFailure
+    registerSuccess
 } from './authSlice';
 import {API} from "../../layout/api.js";
-import {USER_LOGIN_QUERY, USER_REGISTER_QUERY} from "../../components/Auth/queries.js";
+import {
+    USER_FORGET_PASSWORD_QUERY,
+    USER_LOGIN_QUERY,
+    USER_REGISTER_QUERY,
+    USER_RESET_PASSWORD_QUERY
+} from "../../components/Auth/queries.js";
+import {createAsyncThunk} from '@reduxjs/toolkit';
 
 // Login action
 export const loginAction = (email, password) => async (dispatch) => {
@@ -26,8 +35,14 @@ export const loginAction = (email, password) => async (dispatch) => {
                 }
             }
         }).then(({data})=>{
+            const loginData= data
+            console.log("Data ", loginData)
             // Save the user and access token to Redux state
-            dispatch(loginSuccess(data.data?.loginUser));
+            if(loginData.data)
+                dispatch(loginSuccess(loginData.data?.loginUser));
+            else
+                // console.log(registerData.errors.map((error)=>error.message))
+                dispatch(loginFailure(loginData.errors.map((error)=>error.message)))
         }).catch(
             (error) => console.log(error)
         )
@@ -71,8 +86,14 @@ export const registerAction = (value) => async (dispatch) => {
                 }
             }
         }).then(({data})=>{
+            const registerData= data
             // Save the user and access token to Redux state
-            dispatch(registerSuccess(data.data?.registerUser));
+            if(registerData.data)
+                dispatch(registerSuccess(registerData.data?.registerUser));
+            else
+                // console.log(registerData.errors.map((error)=>error.message))
+                dispatch(registerFailure(registerData.errors.map((error)=>error.message)))
+
         }).catch(
             (error) => console.log(error)
         )
@@ -84,6 +105,68 @@ export const registerAction = (value) => async (dispatch) => {
         dispatch(registerFailure(error.response.data.message));
     }
 };
+
+export const forgetPasswordAction = (email) => async (dispatch) => {
+    try {
+        dispatch(forgetPasswordStart());
+
+        // Call the API to initiate the forget password process
+        await API.post('', {
+            query: USER_FORGET_PASSWORD_QUERY(),
+            variables: {
+                email: email
+            }
+        }).then(({data})=>{
+            const forgetPassData= data
+            // Save the user and access token to Redux state
+            if(forgetPassData.data)
+                dispatch(forgetPasswordSuccess(forgetPassData.data?.forgetPassword));
+            else
+                // console.log(registerData.errors.map((error)=>error.message))
+                dispatch(forgetPasswordFailure(forgetPassData.errors.map((error)=>error.message)))
+
+        }).catch(
+            (error) => console.log(error)
+        );
+
+    } catch (error) {
+        dispatch(forgetPasswordFailure(error.message));
+    }
+};
+
+// Async action for resetting password
+export const resetPassword = createAsyncThunk(
+    'auth/resetPassword',
+    async ({ resetToken, newPassword, confirmPassword }, thunkAPI) => {
+        try {
+            // Call the reset password API
+            await API.post('', {
+                query: USER_RESET_PASSWORD_QUERY(),
+                variables: {
+                    input: {
+                        newPassword: newPassword,
+                        confirmPassword: confirmPassword,
+                        resetToken: resetToken
+                    }
+                }
+            }).then(({data})=>{
+                const resetPassData= data
+                // Save the user and access token to Redux state
+                if(resetPassData.data)
+                    return resetPassData.data?.forgetPassword
+                else
+                    return resetPassData.errors.map((error) => error.message)
+
+            }).catch(
+                (error) => console.log(error)
+            );
+
+        } catch (error) {
+            // Handle the error response
+            throw error;
+        }
+    }
+);
 
 // Refresh token action
 // export const refreshToken = () => async (dispatch) => {

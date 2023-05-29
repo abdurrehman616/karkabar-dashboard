@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import { API } from "../../layout/api.js";
-import {SHOP_DELETE_MUTATION, SHOP_MANY_QUERY} from "../../components/Shop/queries.js";
+import {CATEGORY_MANY_QUERY, CATEGORY_DELETE_MUTATION} from "../../components/Category/queries.js";
 import {useQuery} from "react-query";
 import {Pagination} from '../../components/Pagination.jsx'
 import {SearchBar, FilterSection, SortSection} from "../../layout/utils";
 import { Link } from "react-router-dom";
 
-export const Shop = () => {
+export const Category = () => {
     const [page, setPage] = useState(1)
-    const QRY_NAME = 'shopMany';
-    const fetchShops = async (page = 1) => {
+    const QRY_NAME = 'CategoryMany';
+    const fetchCategorys = async (page = 1) => {
         const {data} = await API.post('', {
-            query: SHOP_MANY_QUERY(),
+            query: CATEGORY_MANY_QUERY(),
             variables: {
                 page: page
             },
@@ -32,12 +32,12 @@ export const Shop = () => {
         isFetching,
         isPreviousData,
         refetch
-    } = useQuery(QRY_NAME, ()=>fetchShops(page), { keepPreviousData : true ,refetchOnWindowFocus: false })
+    } = useQuery(QRY_NAME, ()=>fetchCategorys(page), { keepPreviousData : true ,refetchOnWindowFocus: false })
 
     // Query Data
-    const shopData = data?.shopMany.data
-    const hasMore = data?.shopMany.pageInfo.hasMore;
-    const totalPages = data?.shopMany.pageInfo.totalPage
+    const categoryData = data?.categoryMany.data
+    const hasMore = data?.categoryMany.pageInfo.hasMore;
+    const totalPages = data?.categoryMany.pageInfo.totalPage
 
     useEffect(() => {
         refetch();
@@ -54,12 +54,12 @@ export const Shop = () => {
 
                 <div className="flex flex-col w-full">
                     <div className="container-sm flex w-full justify-between items-center gap-3">
-                        <span className="text-3xl font-bold text-primary">List of Shops</span>
-                        <Link to="/add-shop" className="flex gap-2 btn btn-primary btn-sm items-center">
+                        <span className="text-3xl font-bold text-primary">List of Categorys</span>
+                        <Link to="/add-category" className="flex gap-2 btn btn-primary btn-sm items-center">
                             <div>
                                 <i className="fa-solid fa-plus"/>
                             </div>
-                            <div className="text-white">Add New Shop</div>
+                            <div className="text-white">Add New Category</div>
                         </Link>
                     </div>
 
@@ -71,7 +71,7 @@ export const Shop = () => {
                         </div>
                     </div>
 
-                    <Pagination data={shopData}
+                    <Pagination data={categoryData}
                                 error={error}
                                 page={page}
                                 hasMore={hasMore}
@@ -80,8 +80,8 @@ export const Shop = () => {
                                 isPerviousData={isPreviousData}
                                 setPage={setPage}
                                 refetch={refetch}
-                                updateRoute={'/update-shop'}
-                                deleteMutation={SHOP_DELETE_MUTATION()}
+                                updateRoute={'/update-category'}
+                                deleteMutation={CATEGORY_DELETE_MUTATION()}
                     />
                 </div>
             )}

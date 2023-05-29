@@ -1,11 +1,30 @@
 import { useFormik } from 'formik';
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import * as Yup from 'yup';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {registerAction} from "../../store/auth/authActions";
+import {toast} from "react-toastify";
+import {useEffect, useState} from "react";
+import {resetError} from "../../store/auth/authSlice.js";
 
 export const AuthRegisterForm = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const [err, setErr] =useState(null)
+    const loading  = useSelector((state)=>state.auth.loading)
+    const user  = useSelector((state)=>state.auth.user)
+    const error  = useSelector((state)=>state.auth.error)
+
+    useEffect(() => {
+        dispatch(resetError());
+        if(user) {
+            toast.success(`Register Successfully`)
+            navigate('/auth/login')
+        } else {
+            setErr(error)
+        }
+    }, [user, error]);
+
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -16,17 +35,28 @@ export const AuthRegisterForm = () => {
             photo: ''
         },
         validationSchema: Yup.object({
+            name: Yup.string().required('Required Field'),
+            username: Yup.string().required('Required Field'),
             email: Yup.string().required('Required Field').email('Not a proper email'),
             password: Yup.string().required('Required Field').min(8, 'Password is too short - should be 8 chars minimum.'),
+            confirmPassword: Yup.string().required('Required Field').min(8, 'Password is too short - should be 8 chars minimum.'),
         }),
-        onSubmit: (values) => {
+        onSubmit: (values,actions) => {
+            setErr(null)
             dispatch(registerAction(values)); // Perform any necessary logic with the form values
+            if(user) {
+                toast.success(`Register Successfully`)
+                navigate('/auth/login')
+            } else {
+                setErr(error)
+            }
+
         },
     });
 
     return (
         <div className="container flex items-center justify-center">
-            <div className="card flex w-1/2 bg-base-100 shadow-xl">
+            <div className="card flex w-1/3 bg-base-100 shadow-xl">
                 <div className="card-body">
                     <h2 className="card-title">Register</h2>
                     <form onSubmit={formik.handleSubmit}>
@@ -111,6 +141,13 @@ export const AuthRegisterForm = () => {
                                 </div>
                             ) : null}
 
+                            {err ? (
+                                <div className="flex gap-2 items-center bg-opacity-20 bg-error p-2 border rounded border-error">
+                                    <i className="flex fa-solid fa-times-circle text-xs text-error items-center"/>
+                                    <div className="text-error text-xs">{err}</div>
+                                </div>
+                            ): null}
+
                             <div className="flex justify-between">
                                 <span>
                                   Already have an account.
@@ -119,7 +156,12 @@ export const AuthRegisterForm = () => {
                                   </Link>
                                 </span>
 
-                                <button type="submit" className="flex w-1/5 btn btn-sm btn-primary text-base-100">
+                                <button type="submit"
+                                        className={`flex w-1/5 btn btn-sm btn-primary text-base-100
+                                            ${loading ? 'opacity-50 pointer-events-none' : ''}
+                                        `}
+                                        disabled={loading}
+                                >
                                     Register
                                 </button>
                             </div>

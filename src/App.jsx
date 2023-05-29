@@ -6,7 +6,7 @@ import { Loading } from './layout/utils';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { UpdateShop } from './pages/Shop/UpdateShop.jsx';
-import { ProtectedRoute } from './components/ProtectedRoute.jsx';
+import { ProtectedRoute } from './layout/utils/ProtectedRoute.jsx';
 import { Login } from './pages/Auth/Login.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +17,17 @@ import {API} from "./layout/api.js";
 import {USER_ONE_QUERY} from "./components/Auth/queries.js";
 import jwtDecode from 'jwt-decode';
 import {Register} from "./pages/Auth/Register.jsx";
+import {ForgetPassword} from './pages/Auth/ForgetPassword.jsx'
+import {ResetPassword} from "./pages/Auth/ResetPassword.jsx";
+import {Make} from "./pages/Make/Make.jsx";
+import {AddMake} from "./pages/Make/AddMake.jsx";
+import {UpdateMake} from "./pages/Make/UpdateMake.jsx";
+import {Model} from "./pages/Model/Model";
+import {AddModel} from "./pages/Model/AddModel.jsx";
+import {UpdateModel} from "./pages/Model/UpdateModel.jsx";
+import {Category} from "./pages/Category/Category.jsx";
+import {AddCategory} from "./pages/Category/AddCategory.jsx";
+import {UpdateCategory} from "./pages/Category/UpdateCategory.jsx";
 
 function App() {
     const [loading, setLoading] = useState(true);
@@ -24,7 +35,7 @@ function App() {
     const dispatch = useDispatch();
     const location = useLocation();
 
-    const isAuthenticated = useSelector((state) => state.auth.user != null);
+    const isAuthenticated = useSelector((state) => state.auth.user != null && state.auth.accessToken);
     console.log(isAuthenticated)
 
     const preloader = document.getElementById('preloader');
@@ -43,7 +54,8 @@ function App() {
             // Check if accessToken is present in localStorage
             const accessToken = localStorage.getItem('accessToken');
 
-            if (accessToken) {
+            console.log(accessToken)
+            if (accessToken != null ||accessToken !== undefined) {
                 // Decode the accessToken to get the user ID
                 const decodedToken = jwtDecode(accessToken);
                 const id = decodedToken.user;
@@ -87,9 +99,9 @@ function App() {
     ) : (
         <>
             <ToastContainer />
-            {(location.pathname !== '/auth/login' && location.pathname !== '/auth/register') && <AppHeader />}
+            {!location.pathname.includes('/auth') && <AppHeader />}
             <div className='flex w-full max-w-full h-[calc(100vh-80px)]'>
-                {(location.pathname !== '/auth/login' && location.pathname !== '/auth/register') && <SideBar />}
+                {!location.pathname.includes('/auth') && <SideBar />}
                 <Routes>
                     {/* Protected routes */}
                     <Route
@@ -110,7 +122,6 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-
                     <Route
                         path="/add-shop"
                         element={
@@ -119,7 +130,6 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-
                     <Route
                         path="/update-shop"
                         element={
@@ -129,9 +139,89 @@ function App() {
                         }
                     />
 
+                    {/* MAKE */}
+                    <Route
+                        path="/makes"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <Make />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/add-make"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <AddMake />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/update-make"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <UpdateMake />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* MODEL */}
+                    <Route
+                        path="/models"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <Model />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/add-model"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <AddModel />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/update-model"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <UpdateModel />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* Category */}
+                    <Route
+                        path="/categories"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <Category />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/add-category"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <AddCategory />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/update-category"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <UpdateCategory />
+                            </ProtectedRoute>
+                        }
+                    />
+
 
                     <Route path="/auth/login" element={<Login />} />
                     <Route path="/auth/register" element={<Register />} />
+                    <Route path="/auth/forgot-password" element={<ForgetPassword />} />
+                    <Route path="/auth/reset-password" element={<ResetPassword />} />
                 </Routes>
             </div>
         </>

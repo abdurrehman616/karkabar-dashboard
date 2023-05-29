@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import {logoutAction} from "../store/auth/authActions.js"; // Import the logoutAction
+import {logoutAction} from "../store/auth/authActions.js";
+import Dropdown from "../layout/ui/Dropdown/Dropdown.jsx"; // Import the logoutAction
 
 export const AppHeader = () => {
     const user = useSelector((state) => state.auth.user);
@@ -11,6 +12,11 @@ export const AppHeader = () => {
         dispatch(logoutAction());
     };
 
+    const handleSelect = (option) => {
+        console.log('Selected Option:', option);
+    };
+
+
     return (
         <div className="container flex w-full justify-between items-center shadow-lg rounded-lg">
             <div className="flex w-full">
@@ -18,24 +24,10 @@ export const AppHeader = () => {
             </div>
 
             {user !== null ? (
-                <div className="dropdown dropdown-hover dropdown-end">
-                    <label tabIndex={0} className=" m-1">
-                        <div>
-                            <div className="avatar">
-                                <div className="w-8 rounded-full">
-                                    <img src={user?.photo} alt="User Avatar" />
-                                </div>
-                            </div>
-                        </div>
-                    </label>
-                    <ul
-                        tabIndex={0}
-                        className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
-                    >
-                        <li>
-                            <button onClick={handleLogout}>Logout</button>
-                        </li>
-                    </ul>
+                <div>
+                    <Dropdown userImg={user.photo}>
+                        <li onClick={() => handleLogout()}>Logout</li>
+                    </Dropdown>
                 </div>
             ) : (
                 <div className="flex w-full justify-end">

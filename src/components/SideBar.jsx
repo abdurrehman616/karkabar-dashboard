@@ -11,27 +11,32 @@ export const SideBar = () => {
 
                 <div className="flex items-baseline w-full">
                     <i className="fa-solid fa-shop mr-4"></i>
-                    <Link to="/shops" className="text-base-100 font-semibold">Shop</Link>
+                    <Link to="/shops" className="text-base-100 font-semibold">Shops</Link>
+                </div>
+
+                <div className="flex items-baseline w-full">
+                    <i className="fa-solid fa-store mr-4"></i>
+                    <Link to="/my-shop" className="text-base-100 font-semibold">My Shop</Link>
                 </div>
 
                 <div className="flex items-baseline w-full">
                     <i className="fa-solid fa-wrench mr-4"></i>
-                    <a href="/shop/shops" className="text-base-100 font-semibold">Make</a>
+                    <Link to="/makes" className="text-base-100 font-semibold">Make</Link>
                 </div>
 
                 <div className="flex items-baseline w-full">
                     <i className="fa-solid fa-bag-shopping mr-4"></i>
-                    <a href="/shop/shops" className="text-base-100 font-semibold">Category</a>
+                    <Link to="/categories" className="text-base-100 font-semibold">Category</Link>
                 </div>
 
                 <div className="flex items-baseline w-full">
                     <i className="fa-solid fa-car mr-4"></i>
-                    <a href="/shop/shops" className="text-base-100 font-semibold">Model</a>
+                    <Link to="/models" className="text-base-100 font-semibold">Model</Link>
                 </div>
 
                 <div className="flex items-baseline w-full">
                     <i className="fa-solid fa-cart-shopping mr-4"></i>
-                    <a href="/shop/shops" className="text-base-100 font-semibold">Product</a>
+                    <Link to="/products" className="text-base-100 font-semibold">Product</Link>
                 </div>
             </div>
         </div>

@@ -72,8 +72,8 @@ export const SHOP_UPDATE_MUTATION = () => {
 
 export const SHOP_DELETE_MUTATION = () => {
     return `
-        mutation Mutation($shopDeleteId: ID!) {
-            shopDelete(id: $shopDeleteId) {
+        mutation Mutation($id: ID!) {
+            shopDelete(id: $id) {
                 id
                 shop_name
                 shop_sku

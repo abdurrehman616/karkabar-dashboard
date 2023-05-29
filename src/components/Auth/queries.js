@@ -39,6 +39,26 @@ export const USER_REGISTER_QUERY = () => {
     `;
 };
 
+export const USER_FORGET_PASSWORD_QUERY = () => {
+    return `
+        mutation ForgetPassword($email: String!) {
+          forgetPassword(email: $email) {
+            status
+          }
+        }
+    `;
+};
+
+export const USER_RESET_PASSWORD_QUERY = () => {
+    return `
+        mutation ResetPassword($input: UserResetPasswordInput!) {
+          resetPassword(input: $input) {
+            status
+          }
+        }
+    `;
+};
+
 export const USER_ONE_QUERY = () => {
     return `
         query UserOne($userId: ID!) {

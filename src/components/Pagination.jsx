@@ -1,7 +1,9 @@
 import {Table} from "../layout/ui/Table/Table.jsx";
 import {useState} from "react";
 
-export const Pagination = ({data, page, hasMore, totalPages, isFetching, isPreviousData, setPage, refetch}) => {
+export const Pagination = ({
+       data, page, hasMore, totalPages, isFetching, isPreviousData, setPage, refetch, updateRoute, deleteMutation
+}) => {
     const [active, setActive] = useState(true)
     // it is for page numbers between next and previous button
     const getPages = () => {
@@ -28,7 +30,12 @@ export const Pagination = ({data, page, hasMore, totalPages, isFetching, isPrevi
     return (
         <div className='container flex flex-col w-full overflow-y-auto'>
             <div>
-                <Table data={data} page={page} refetch={refetch}/>
+                <Table data={data}
+                       page={page}
+                       refetch={refetch}
+                       updateRoute={updateRoute}
+                       deleteMutation={deleteMutation}
+                />
             </div>
 
             <div className='flex justify-end gap-2 w-full pt-3'>
