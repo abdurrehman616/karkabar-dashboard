@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import { API } from "../../layout/api.js";
-import {MODEL_MANY_QUERY, MODEL_DELETE_MUTATION} from "../../components/Model/queries.js";
+import {PRODUCT_DELETE_MUTATION, PRODUCT_MANY_QUERY} from "../../components/Product/queries.js";
 import {useQuery} from "react-query";
 import {Pagination} from '../../components/Pagination.jsx'
 import {SearchBar, FilterSection, SortSection} from "../../layout/utils";
 import { Link } from "react-router-dom";
 
-export const Model = () => {
+export const Product = () => {
     const [page, setPage] = useState(1)
-    const QRY_NAME = 'ModelMany';
-    const fetchModels = async (page = 1) => {
+    const QRY_NAME = 'productMany';
+    const fetchProducts = async (page = 1) => {
         const {data} = await API.post('', {
-            query: MODEL_MANY_QUERY(),
+            query: PRODUCT_MANY_QUERY(),
             variables: {
                 page: page
             },
@@ -32,12 +32,13 @@ export const Model = () => {
         isFetching,
         isPreviousData,
         refetch
-    } = useQuery(QRY_NAME, ()=>fetchModels(page), { keepPreviousData : true ,refetchOnWindowFocus: false })
+    } = useQuery(QRY_NAME, ()=>fetchProducts(page), { keepPreviousData : true ,refetchOnWindowFocus: false })
 
     // Query Data
-    const modelData = data?.modelMany.data
-    const hasMore = data?.modelMany.pageInfo.hasMore;
-    const totalPages = data?.modelMany.pageInfo.totalPage
+    const productData = data?.productMany.data
+    console.log(productData)
+    const hasMore = data?.productMany.pageInfo.hasMore;
+    const totalPages = data?.productMany.pageInfo.totalPage
 
     useEffect(() => {
         refetch();
@@ -54,12 +55,12 @@ export const Model = () => {
 
                 <div className="flex flex-col w-full">
                     <div className="container-sm flex w-full justify-between items-center gap-3">
-                        <span className="text-3xl font-bold text-primary">List of Models</span>
-                        <Link to="/add-model" className="flex gap-2 btn btn-primary btn-sm items-center">
+                        <span className="text-3xl font-bold text-primary">List of Products</span>
+                        <Link to="/add-product" className="flex gap-2 btn btn-primary btn-sm items-center">
                             <div>
                                 <i className="fa-solid fa-plus"/>
                             </div>
-                            <div className="text-white">Add New Model</div>
+                            <div className="text-white">Add New Product</div>
                         </Link>
                     </div>
 
@@ -71,7 +72,7 @@ export const Model = () => {
                         </div>
                     </div>
 
-                    <Pagination data={modelData}
+                    <Pagination data={productData}
                                 error={error}
                                 page={page}
                                 hasMore={hasMore}
@@ -80,9 +81,9 @@ export const Model = () => {
                                 isPerviousData={isPreviousData}
                                 setPage={setPage}
                                 refetch={refetch}
-                                updateRoute={'/update-model'}
-                                deleteMutation={MODEL_DELETE_MUTATION()}
-                                omitKeys={['id']}
+                                updateRoute={'/update-product'}
+                                deleteMutation={PRODUCT_DELETE_MUTATION()}
+                                omitKeys={['category', 'category_id', 'shop', 'shop_id', 'status', 'id', 'description']}
                     />
                 </div>
             )}

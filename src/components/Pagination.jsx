@@ -2,7 +2,9 @@ import {Table} from "../layout/ui/Table/Table.jsx";
 import {useState} from "react";
 
 export const Pagination = ({
-       data, page, hasMore, totalPages, isFetching, isPreviousData, setPage, refetch, updateRoute, deleteMutation
+       data, page, hasMore, totalPages, isFetching,
+       isPreviousData, setPage, refetch, updateRoute,
+        deleteMutation, omitKeys
 }) => {
     const [active, setActive] = useState(true)
     // it is for page numbers between next and previous button
@@ -35,6 +37,7 @@ export const Pagination = ({
                        refetch={refetch}
                        updateRoute={updateRoute}
                        deleteMutation={deleteMutation}
+                       omitKeys={omitKeys}
                 />
             </div>
 

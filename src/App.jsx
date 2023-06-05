@@ -28,6 +28,8 @@ import {UpdateModel} from "./pages/Model/UpdateModel.jsx";
 import {Category} from "./pages/Category/Category.jsx";
 import {AddCategory} from "./pages/Category/AddCategory.jsx";
 import {UpdateCategory} from "./pages/Category/UpdateCategory.jsx";
+import {Product} from "./pages/Product/Product.jsx";
+import {AddProduct} from "./pages/Product/AddProduct";
 
 function App() {
     const [loading, setLoading] = useState(true);
@@ -217,6 +219,23 @@ function App() {
                         }
                     />
 
+                    {/* Product */}
+                    <Route
+                        path="/products"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <Product />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/add-product"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <AddProduct />
+                            </ProtectedRoute>
+                        }
+                    />
 
                     <Route path="/auth/login" element={<Login />} />
                     <Route path="/auth/register" element={<Register />} />

@@ -1,15 +1,14 @@
-import { DEFAULT_PAGE_SIZE, MutationFn } from "../../api.js";
-import { useMutation } from "react-query";
-import { SHOP_DELETE_MUTATION } from "../../../components/Shop/queries.js";
-import { toast } from 'react-toastify';
-import { useNavigate } from "react-router-dom";
+import {DEFAULT_PAGE_SIZE, MutationFn} from "../../api.js";
+import {useMutation} from "react-query";
+import {toast} from 'react-toastify';
+import {useNavigate} from "react-router-dom";
+import lodash from 'lodash'
 
-export const Table = ({ data, page, refetch, updateRoute, deleteMutation }) => {
+export const Table = ({ data, page, refetch, updateRoute, deleteMutation, omitKeys }) => {
     const startId = (page - 1) * DEFAULT_PAGE_SIZE + 1;
 
-    const filteredData = data;
-
     const mutation = useMutation(MutationFn({ query: deleteMutation }));
+    // const  = data
 
     // Update Shop
     const navigate = useNavigate();
@@ -35,6 +34,12 @@ export const Table = ({ data, page, refetch, updateRoute, deleteMutation }) => {
             }
         );
     };
+    
+    const filteredData = data?.map((data)=> {
+        return lodash.omit(data, omitKeys)
+    })
+    
+    console.log(filteredData)
 
     return (
         <div className="overflow-x-auto relative shadow-md w-full rounded">
@@ -45,7 +50,7 @@ export const Table = ({ data, page, refetch, updateRoute, deleteMutation }) => {
                         <th scope="col" className="py-3 px-6 text-white">
                             #
                         </th>
-                        {Object.keys(data[0])
+                        {Object.keys(filteredData[0])
                             .filter((key) => key !== "id" && key !== "status")
                             .map((key, i) => (
                                 <th key={i} scope="col" className="py-3 px-6 text-white">
@@ -64,7 +69,6 @@ export const Table = ({ data, page, refetch, updateRoute, deleteMutation }) => {
                                 {index + startId}
                             </td>
                             {Object.values(row)
-                                .slice(1, 3)
                                 .map((cell, i) => (
                                     <td
                                         key={i}
