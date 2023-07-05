@@ -82,7 +82,7 @@ export const Shop = () => {
                                 refetch={refetch}
                                 updateRoute={'/update-shop'}
                                 deleteMutation={SHOP_DELETE_MUTATION()}
-                                omitKeys={['id', 'status']}
+                                omitKeys={['id', 'status', 'user', 'user_id']}
                     />
                 </div>
             )}

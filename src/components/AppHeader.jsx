@@ -25,7 +25,7 @@ export const AppHeader = () => {
 
             {user !== null ? (
                 <div>
-                    <Dropdown userImg={user.photo}>
+                    <Dropdown userImg={user?.photo}>
                         <li onClick={() => handleLogout()}>Logout</li>
                     </Dropdown>
                 </div>

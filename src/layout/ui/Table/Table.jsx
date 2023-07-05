@@ -35,9 +35,13 @@ export const Table = ({ data, page, refetch, updateRoute, deleteMutation, omitKe
         );
     };
     
-    const filteredData = data?.map((data)=> {
-        return lodash.omit(data, omitKeys)
-    })
+    const filteredData = data?.map((data) => {
+        const filteredItem = lodash.omit(data, omitKeys);
+        return {
+            ...filteredItem,
+            id: data.id // Include the "id" key in each filtered item
+        };
+    });
     
     console.log(filteredData)
 
@@ -51,7 +55,7 @@ export const Table = ({ data, page, refetch, updateRoute, deleteMutation, omitKe
                             #
                         </th>
                         {Object.keys(filteredData[0])
-                            .filter((key) => key !== "id" && key !== "status")
+                            .filter((key) => key !== 'id') // Exclude the "id" key from mapping
                             .map((key, i) => (
                                 <th key={i} scope="col" className="py-3 px-6 text-white">
                                     {key.replace("_", " ")}
@@ -69,6 +73,7 @@ export const Table = ({ data, page, refetch, updateRoute, deleteMutation, omitKe
                                 {index + startId}
                             </td>
                             {Object.values(row)
+                                .filter((value, i) => Object.keys(row)[i] !== 'id')
                                 .map((cell, i) => (
                                     <td
                                         key={i}

@@ -25,6 +25,17 @@ export const SHOP_MANY_QUERY = () => {
               shop_name
               shop_sku
               status
+              user_id
+              user {
+                  createdAt
+                  email
+                  id
+                  name
+                  photo
+                  role
+                  updatedAt
+                  username
+              }
             }
           }
         }
@@ -35,10 +46,21 @@ export const SHOP_ONE_QUERY = () => {
     return `
         query ShopOne($id: ID!) {
           shopOne(id: $id) {
-            id
-            shop_name
-            shop_sku
-            status
+              id
+              shop_name
+              shop_sku
+              status
+              user_id
+              user {
+                  createdAt
+                  email
+                  id
+                  name
+                  photo
+                  role
+                  updatedAt
+                  username
+              }
           }
         }
     `;
@@ -52,6 +74,17 @@ export const SHOP_CREATE_MUTATION = () => {
           shop_name
           shop_sku
           status
+          user_id
+          user {
+              createdAt
+              email
+              id
+              name
+              photo
+              role
+              updatedAt
+              username
+          }
         }
       }
     `;
@@ -65,6 +98,17 @@ export const SHOP_UPDATE_MUTATION = () => {
                 shop_name
                 shop_sku
                 status
+                user_id
+                user {
+                    createdAt
+                    email
+                    id
+                    name
+                    photo
+                    role
+                    updatedAt
+                    username
+                }
             }
         }
     `;

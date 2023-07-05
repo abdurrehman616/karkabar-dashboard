@@ -6,11 +6,20 @@ import {MODEL_CREATE_MUTATION, MODEL_ONE_QUERY, MODEL_UPDATE_MUTATION} from "./q
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
+import {Popup} from "../../layout/ui/Popup/Popup.jsx";
+import {GetSingleDataQuery} from "../../layout/utils/GetSingleDataQuery.jsx";
+import {MAKE_MANY_QUERY, MAKE_ONE_QUERY} from "../Make/queries.js";
 
 export const ModelForm = ({id}) => {
-    const [message, setMessage] = useState(null)
     const [error, setError] = useState(null)
-    const [loading, setLoading] = useState(false)
+    const [selectedMakeId, setSelectedMakeId] = useState(null);
+    const [isMakePopupOpen, setIsMakePopupOpen] = useState(false);
+    const [makeName, setMakeName] = useState('')
+    
+    const handleSelectMake = (makeId) => {
+        setSelectedMakeId(makeId);
+        setIsMakePopupOpen(false);
+    };
 
     const navigate =useNavigate();
     const mutation = useMutation(MutationFn({
@@ -19,6 +28,7 @@ export const ModelForm = ({id}) => {
     const formik = useFormik({
         initialValues: {
             model_name: '',
+            make_id: null
         },
         validationSchema: Yup.object({
             model_name: Yup.string()
@@ -30,6 +40,7 @@ export const ModelForm = ({id}) => {
                 id: id || null,
                 input: {
                     model_name: values.model_name,
+                    make_id: selectedMakeId,
                 }
             }, {
                 onSuccess: ({data, errors}) => {
@@ -49,15 +60,14 @@ export const ModelForm = ({id}) => {
                             values: {
                                 // the type of `values` inferred to be Blog
                                 model_name: '',
+                                make_id: '',
                             },
                         })
                     } else {
-                        setMessage(null)
                         setError(errors.map((error)=> error.message))
                     }
                 },
                 onSettled: async () => {
-                    setLoading(false)
                     console.log('Mutation Settled.');
                 }
             });
@@ -93,6 +103,20 @@ export const ModelForm = ({id}) => {
             fetchModelDetails(id);
         }
     }, [id]);
+    
+    if(selectedMakeId !== null){
+        GetSingleDataQuery({
+            query: MAKE_ONE_QUERY(),
+            id: selectedMakeId,
+        })
+            .then((response) => {
+                setMakeName(response.data.makeOne.make_name)
+                // Continue with your logic here
+            })
+            .catch((error) => {
+                console.log('Error fetching make details:', error);
+            });
+    }
 
     return (
         <form onSubmit={formik.handleSubmit} className='flex flex-col gap-5'>
@@ -114,6 +138,38 @@ export const ModelForm = ({id}) => {
                     </div>
                 ) : null}
             </div>
+    
+            <div className="flex flex-col w-full gap-1">
+                <label htmlFor="make_id" className="font-semibold">
+                    Make
+                </label>
+                <div className="relative">
+                    <input
+                        id="make_id"
+                        name="make_id"
+                        type="text"
+                        className="input input-bordered rounded input-sm w-full focus:outline-none py-5"
+                        readOnly
+                        value={makeName}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setIsMakePopupOpen(true)}
+                        className="absolute top-0 right-0 px-3 py-1.5 bg-primary rounded-r text-white text-sm focus:outline-none"
+                    >
+                        Select Make
+                    </button>
+                </div>
+            </div>
+            {isMakePopupOpen && (
+                <Popup
+                    onSelectItem={handleSelectMake}
+                    onClose={() => setIsMakePopupOpen(false)}
+                    query={MAKE_MANY_QUERY()}
+                    filteringProperty={"make_name"}
+                    queryName={'makeMany'}
+                />
+            )}
 
             {error ? (
                 <div className="flex gap-2 items-center">

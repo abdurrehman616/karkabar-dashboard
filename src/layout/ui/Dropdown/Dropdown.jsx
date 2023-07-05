@@ -31,7 +31,7 @@ const Dropdown = ({ children, userImg }) => {
     return (
         <div className="dropdown relative" ref={dropdownRef}>
             <button className="dropdown-toggle rounded" onClick={toggleDropdown}>
-                <img className="w-8" src={userImg}/>
+                {userImg ? (<img className="w-8" src={userImg}/>) : (<div>DropDown</div>)}
             </button>
             {isOpen && (
                 <ul className="flex flex-col w-full dropdown-menu absolute right-10 bg-white shadow top-full py-2 px-3">

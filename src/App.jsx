@@ -30,6 +30,10 @@ import {AddCategory} from "./pages/Category/AddCategory.jsx";
 import {UpdateCategory} from "./pages/Category/UpdateCategory.jsx";
 import {Product} from "./pages/Product/Product.jsx";
 import {AddProduct} from "./pages/Product/AddProduct";
+import {AuthUser} from "./pages/Auth/AuthUser.jsx";
+import {UpdateUser} from "./pages/Auth/UpdateUser";
+import {Order} from './pages/Order/Order.jsx'
+import {Test} from "./pages/test/Test.jsx";
 
 function App() {
     const [loading, setLoading] = useState(true);
@@ -38,7 +42,6 @@ function App() {
     const location = useLocation();
 
     const isAuthenticated = useSelector((state) => state.auth.user != null && state.auth.accessToken);
-    console.log(isAuthenticated)
 
     const preloader = document.getElementById('preloader');
 
@@ -55,8 +58,7 @@ function App() {
 
             // Check if accessToken is present in localStorage
             const accessToken = localStorage.getItem('accessToken');
-
-            console.log(accessToken)
+            
             if (accessToken != null ||accessToken !== undefined) {
                 // Decode the accessToken to get the user ID
                 const decodedToken = jwtDecode(accessToken);
@@ -68,7 +70,7 @@ function App() {
                     const { data } = await API.post('', {
                         query: USER_ONE_QUERY(),
                         variables: {
-                            userId: id
+                            id: id
                         },
                     });
                     user = data.data?.userOne;
@@ -105,12 +107,42 @@ function App() {
             <div className='flex w-full max-w-full h-[calc(100vh-80px)]'>
                 {!location.pathname.includes('/auth') && <SideBar />}
                 <Routes>
+                    
+                    
                     {/* Protected routes */}
                     <Route
                         path="/"
                         element={
                             <ProtectedRoute isAuthenticated={isAuthenticated}>
                                 <Dashboard />
+                            </ProtectedRoute>
+                        }
+                    />
+    
+                    {/* User */}
+                    <Route
+                        path="/users"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <AuthUser />
+                            </ProtectedRoute>
+                        }
+                    />
+                    
+                    <Route
+                        path="/test"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <Test />
+                            </ProtectedRoute>
+                        }
+                    />
+    
+                    <Route
+                        path="/update-user"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <UpdateUser />
                             </ProtectedRoute>
                         }
                     />
@@ -233,6 +265,16 @@ function App() {
                         element={
                             <ProtectedRoute isAuthenticated={isAuthenticated}>
                                 <AddProduct />
+                            </ProtectedRoute>
+                        }
+                    />
+    
+                    {/* Order */}
+                    <Route
+                        path="/orders"
+                        element={
+                            <ProtectedRoute isAuthenticated={isAuthenticated}>
+                                <Order />
                             </ProtectedRoute>
                         }
                     />

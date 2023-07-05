@@ -72,7 +72,9 @@ const PaginatedQueryMergePages = (queryResult, queryName) => {
 const FlattenEdges = (edges) => Lodash.flatMap(edges, (edge) => edge.node);
 
 const MutationFn = (payload) => {
+    
     return async (obj) => {
+        console.log(obj.image)
         const {data} = await API.post('', {
             query: payload.query,
             variables: {
@@ -88,6 +90,35 @@ const MutationFn = (payload) => {
     }
 }
 
+const FormDataMutationFn = (payload) => {
+    return async (obj) => {
+        console.log(obj.image);
+        
+        const formData = new FormData();
+        formData.append('image', obj.image);
+        
+        // Check if payload has variables field
+        if (payload.variables) {
+            // Append variables to the FormData object
+            Object.entries(payload.variables).forEach(([key, value]) => {
+                formData.append(key, value);
+            });
+        }
+        
+        const { data } = await API.post('', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            params: {
+                query: payload.query,
+            },
+        }).catch((error) => console.log(error));
+        
+        console.log(data);
+        return data;
+    };
+};
+
 export {
     DEFAULT_PAGE_SIZE,
     QueryFn,
@@ -95,5 +126,6 @@ export {
     PaginatedQueryGetNextPageCursor,
     PaginatedQueryMergePages,
     MutationFn,
-    FlattenEdges
+    FlattenEdges,
+    FormDataMutationFn
 }

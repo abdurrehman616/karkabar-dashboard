@@ -6,11 +6,40 @@ import {SHOP_CREATE_MUTATION, SHOP_ONE_QUERY, SHOP_UPDATE_MUTATION} from "./quer
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
+import {Popup} from "../../layout/ui/Popup/Popup.jsx";
+import {CATEGORY_MANY_QUERY, CATEGORY_ONE_QUERY} from "../Category/queries.js";
+import {GetSingleDataQuery} from "../../layout/utils/GetSingleDataQuery.jsx";
+import {USER_MANY_QUERY, USER_ONE_QUERY} from "../Auth/queries";
 
 export const ShopForm = ({id}) => {
     const [message, setMessage] = useState(null)
     const [error, setError] = useState(null)
-    const [loading, setLoading] = useState(false)
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [userName, setUserName] = useState('')
+    const [selectedId, setSelectedId] = useState(null);
+    const [shop, setShop] = useState(null)
+    
+    const handleSelectUser = (id) => {
+        setSelectedId(id);
+        setIsPopupOpen(false);
+    };
+    
+    if(selectedId !== null){
+        GetSingleDataQuery({
+            query: USER_ONE_QUERY(),
+            id: selectedId,
+        })
+            .then((response) => {
+                console.log(response)
+                setUserName(response.data?.userOne.name)
+                // Continue with your logic here
+            })
+            .catch((error) => {
+                console.log('Error fetching user details:', error);
+            });
+    }
+    
+    console.log(selectedId)
 
     const navigate =useNavigate();
     const mutation = useMutation(MutationFn({
@@ -20,6 +49,7 @@ export const ShopForm = ({id}) => {
         initialValues: {
             shop_name: '',
             shop_sku: '',
+            user_id: null
         },
         validationSchema: Yup.object({
             shop_name: Yup.string()
@@ -34,7 +64,8 @@ export const ShopForm = ({id}) => {
                 id: id || null,
                 input: {
                     shop_name: values.shop_name,
-                    shop_sku: values.shop_sku
+                    shop_sku: values.shop_sku,
+                    user_id: selectedId
                 }
             }, {
                 onSuccess: ({data, errors}) => {
@@ -63,7 +94,6 @@ export const ShopForm = ({id}) => {
                     }
                 },
                 onSettled: async () => {
-                    setLoading(false)
                     console.log('Mutation Settled.');
                 }
             });
@@ -77,18 +107,21 @@ export const ShopForm = ({id}) => {
             const {data} = await API.post('', {
                 query: SHOP_ONE_QUERY(),
                 variables: {
-                    id
+                    id: id
                 },
             }).then((data)=>{
                 return data.data
             }).catch(
                 (r) => console.log(r)
             )
+            
+            setShop(data?.shopOne)
 
             // Set the fetched shop details in the formik values
             await formik.setValues({
                 shop_name: data?.shopOne.shop_name,
-                shop_sku: data?.shopOne.shop_sku
+                shop_sku: data?.shopOne.shop_sku,
+                user_id: data?.shopOne.user_id
             });
         } catch (error) {
             console.log('Error fetching shop details:', error);
@@ -147,6 +180,39 @@ export const ShopForm = ({id}) => {
                     <i className="fa-solid fa-check-circle text-success" />
                 </div>
             ): null}
+    
+            <div className="flex flex-col w-full gap-1">
+                <label htmlFor="make_id" className="font-semibold">
+                    User
+                </label>
+                <div className="relative">
+                    <input
+                        id="user_id"
+                        name="user_id"
+                        type="text"
+                        className="input input-bordered rounded input-sm w-full focus:outline-none py-5"
+                        readOnly
+                        value={shop ? shop?.user?.name : userName}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setIsPopupOpen(true)}
+                        className='absolute top-0 right-0 px-3 py-2.5 bg-primary rounded-r text-white text-sm focus:outline-none'
+                    >
+                        Select User
+                    </button>
+                </div>
+            </div>
+            {/* ... your existing code ... */}
+            {isPopupOpen && (
+                <Popup
+                    onSelectItem={handleSelectUser}
+                    onClose={() => setIsPopupOpen(false)}
+                    query={USER_MANY_QUERY()}
+                    filteringProperty={"name"}
+                    queryName={'userMany'}
+                />
+            )}
 
             {error ? (
                    <div className="flex gap-2 items-center">

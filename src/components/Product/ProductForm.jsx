@@ -3,16 +3,33 @@ import * as Yup from 'yup';
 import { useMutation } from 'react-query';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import {MutationFn} from "../../layout/api.js";
-import {PRODUCT_CREATE_MUTATION, PRODUCT_UPDATE_MUTATION} from "./queries.js"; // Replace with your API functions
+import { MutationFn} from "../../layout/api.js";
+import {PRODUCT_CREATE_MUTATION, PRODUCT_UPDATE_MUTATION} from "./queries.js";
+import {Popup} from "../../layout/ui/Popup/Popup.jsx";
+import {CATEGORY_MANY_QUERY, CATEGORY_ONE_QUERY} from "../Category/queries";
+import {useState} from "react";
+import {GetSingleDataQuery} from "../../layout/utils/GetSingleDataQuery.jsx";
+import {useSelector} from "react-redux";
 
 export const ProductForm = ({ id }) => {
+    const [selectedId, setSelectedId] = useState(null);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [categoryName, setCategoryName] = useState('')
+    const [image, setImage] = useState(null)
+    
+    const shop = useSelector((state)=> state?.auth.user?.shop)
     const navigate = useNavigate();
-
+    
+    
+    const handleSelectCategory = (makeId) => {
+        setSelectedId(makeId);
+        setIsPopupOpen(false);
+    };
+    
     const mutation = useMutation(MutationFn({
         query: id ? PRODUCT_UPDATE_MUTATION() : PRODUCT_CREATE_MUTATION()
     }));
-
+    
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -22,7 +39,6 @@ export const ProductForm = ({ id }) => {
             chasis_number: '',
             description: '',
             sku: '',
-            image: '',
             category_id: '',
         },
         validationSchema: Yup.object({
@@ -35,25 +51,30 @@ export const ProductForm = ({ id }) => {
         }),
         onSubmit: async (values) => {
             try {
-                const { data } = await mutation.mutateAsync({
-                    id,
-                    input: {
-                        name: values.name,
-                        from: values.from,
-                        to: values.to,
-                        price: values.price,
-                        chasis_number: values.chasis_number,
-                        description: values.description,
-                        sku: values.sku,
-                        images:{
-                            image_url: values.image
-                        }
+                if(image !== {}) {
+                    const { data, errors } = await mutation.mutateAsync({
+                        id,
+                        
+                        input: {
+                            name: values.name,
+                            from: values.from,
+                            to: values.to,
+                            price: values.price,
+                            chasis_number: values.chasis_number,
+                            description: values.description,
+                            sku: values.sku,
+                            category_id: selectedId,
+                            shop_id: shop?.id,
+                            image: image
+                        },
+                    });
+    
+                    if (data?.productCreate !== null) {
+                        toast.success(`${id ? 'Product updated' : 'Product added'} successfully`);
+                        navigate('/products');
+                    }else {
+                        toast.error(`${errors[0].message}`)
                     }
-                });
-
-                if (data) {
-                    toast.success(`${id ? 'Product updated' : 'Product added'} successfully`);
-                    navigate('/products');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -62,6 +83,7 @@ export const ProductForm = ({ id }) => {
         },
     });
     
+    console.log("image: ", image)
     // Generate years
     //Determine the Current Year.
     let currentYear = (new Date()).getFullYear();
@@ -70,6 +92,20 @@ export const ProductForm = ({ id }) => {
     //Loop and add the Year values to DropDownList.
     for (let i = 1950; i <= currentYear; i++) {
         arrayOfYear = [i, ...arrayOfYear]
+    }
+    
+    if(selectedId !== null){
+        GetSingleDataQuery({
+            query: CATEGORY_ONE_QUERY(),
+            id: selectedId,
+        })
+            .then((response) => {
+                setCategoryName(response.data?.categoryOne.category_name)
+                // Continue with your logic here
+            })
+            .catch((error) => {
+                console.log('Error fetching make details:', error);
+            });
     }
 
     return (
@@ -237,7 +273,7 @@ export const ProductForm = ({ id }) => {
                     </div>
                 ) : null}
             </div>
-
+    
             <div className='flex flex-col w-full gap-1'>
                 <label htmlFor='image' className='font-semibold'>
                     Images
@@ -248,9 +284,7 @@ export const ProductForm = ({ id }) => {
                     type='file'
                     multiple
                     className='input input-bordered rounded input-sm w-full focus:outline-none h-auto'
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.image}
+                    onChange={(e) => setImage(e.target.files[0])}
                 />
                 {formik.touched.image && formik.errors.image ? (
                     <div className='flex w-full'>
@@ -259,29 +293,49 @@ export const ProductForm = ({ id }) => {
                     </div>
                 ) : null}
             </div>
-
-            <div className='flex flex-col w-full gap-1'>
-                <label htmlFor='category_id' className='font-semibold'>
+    
+            <div className="flex flex-col w-full gap-1">
+                <label htmlFor="make_id" className="font-semibold">
                     Category
                 </label>
-                <select
-                    id='category_id'
-                    name='category_id'
-                    className='input input-bordered rounded input-sm w-full focus:outline-none py-5'
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.category_id}
-                >
-                    <option value='' disabled>Select category</option>
-                    {/* Render options for categories */}
-                </select>
-                {formik.touched.category_id && formik.errors.category_id ? (
-                    <div className='flex w-full'>
-                        <i className='flex fa-solid fa-times-circle text-xs text-error items-center' />
-                        <span className='text-error text-xs pl-2'>{formik.errors.category_id}</span>
-                    </div>
-                ) : null}
+                <div className="relative">
+                    <input
+                        id="category_id"
+                        name="category_id"
+                        type="text"
+                        className="input input-bordered rounded input-sm w-full focus:outline-none py-5"
+                        readOnly
+                        value={categoryName}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setIsPopupOpen(true)}
+                        className="absolute top-0 right-0 px-3 py-2.5 bg-primary rounded-r text-white text-sm focus:outline-none"
+                    >
+                        Select Category
+                    </button>
+                </div>
             </div>
+            {/* ... your existing code ... */}
+            {isPopupOpen && (
+                <Popup
+                    onSelectItem={handleSelectCategory}
+                    onClose={() => setIsPopupOpen(false)}
+                    query={CATEGORY_MANY_QUERY()}
+                    filteringProperty={"category_name"}
+                    queryName={'categoryMany'}
+                />
+            )}
+            
+            
+            
+            {shop && (
+                <div className="flex flex-col w-full bordered">
+                    <span className="text-lg">{shop.shop_name}</span>
+                    <span className="text-xs">{shop.shop_sku}</span>
+                </div>
+            )}
+            
 
             <div className='flex justify-end'>
                 <button

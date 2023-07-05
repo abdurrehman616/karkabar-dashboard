@@ -79,11 +79,6 @@ export const PRODUCT_CREATE_MUTATION = () => {
           description
           from
           id
-          images {
-            id
-            featured_image
-            image_url
-          }
           name
           price
           shop_id
@@ -95,31 +90,41 @@ export const PRODUCT_CREATE_MUTATION = () => {
     `;
 };
 
+export const IMAGE_CREATE_MUTATION = () => {
+    return `
+      mutation ImageCreate($image: Upload!) {
+        imageCreate(image: $image) {
+          image
+        }
+      }
+    `;
+};
+
 export const PRODUCT_UPDATE_MUTATION = () => {
     return `
-        mutation ($id: ID!, $input: ProductUpdateInput!) {
-            productUpdate(id: $id, input: $input) {
+        mutation ($id: ID!, $input: ProductUpdateInput!, $image: Upload!) {
+            productUpdate(id: $id, input: $input, image:$image) {
                 category {
                     category_name
                     id
-                  }
-                  category_id
-                  chasis_number
-                  description
-                  from
-                  id
-                  images {
-                    id
-                    featured_image
-                    image_url
-                  }
-                  name
-                  price
-                  shop_id
-                  sku
-                  status
-                  to
                 }
+                category_id
+                chasis_number
+                description
+                from
+                id
+                images {
+                   id
+                   featured_image
+                   image_url
+                }
+                name
+                price
+                shop_id
+                sku
+                status
+                to
+            }
         }
     `;
 };
